@@ -18,7 +18,7 @@ defaultNrBootRep= 501;
 defaultMuaSub = [0 1/20 1/10 1/5]; % only used if method 'mua_composition'
 
 p = inputParser;
-addParameter(p,'method',defaultMethod,@isstring);
+addParameter(p,'method',defaultMethod,@ischar);
 addParameter(p,'sigma',defaultSigma,@isnumeric);
 addParameter(p,'nrBootRep',defaultNrBootRep,@isnumeric);
 addParameter(p,'muaSub',defaultMuaSub,@isnumeric);
@@ -251,7 +251,7 @@ switch method
         theta = NaN(4,nrMuaSub,nrCells);
         MSE = NaN(2,nrMuaSub,nrCells);
         R = NaN(2,nrMuaSub,nrCells);
-        pred = struct('resp',NaN,'FB',NaN,'N',NaN);
+        pred = struct('resp',NaN,'DI',NaN,'H0',NaN);
         
         options = optimset('Display','off','TolX',1.e-4,'TolFun',1.e-4,'MaxFunEvals',10000,'MaxIter',10000,'FunValCheck','off');
         
@@ -263,7 +263,7 @@ switch method
                 %%
                 waitbar((iCell+(iSpeed-1)*nrCells)/(nrCells*nrSpeeds),h)
                 
-                rfCenterLoc = data.rfCenter(iCell);
+                rfCenterLoc = data.rfcenter(iCell);
                 rf0 = (rfCenterLoc-data.stim.center_inDeg);
                 
                 time = motionTimesSpk{iSpeed}(motionStaySpk{iSpeed});
@@ -319,7 +319,7 @@ switch method
                     
                     rateM = mean(spkMSub*1000,2);
                     
-                    x_train = rateM'-nanmean(rateM(1:250));
+                    x_train = rateM-nanmean(rateM(1:250));
                     x_train = conv(x_train,gauss_filt,'same');
                     x_train = x_train(motionStaySpk{iSpeed});
                     x_train = x_train(timeStay);
